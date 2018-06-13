@@ -5,7 +5,7 @@ import argparse
 import codecs
 import json
 import os
-
+from time import sleep
 import numpy as np
 from char_rnn_model import *
 from train import load_vocab
@@ -101,13 +101,17 @@ def main():
         if args.seed >= 0:
             np.random.seed(args.seed)
         # Sampling a sequence 
+        start_text = args.start_text
         with tf.Session(graph=graph) as session:
             saver.restore(session, best_model)
-            sample = test_model.sample_seq(session, args.length, args.start_text,
+            while True:
+                sample = test_model.sample_seq(session, args.length, start_text,
                                             vocab_index_dict, index_vocab_dict,
                                             temperature=args.temperature,
                                             max_prob=args.max_prob)
-            print('Sampled text is:\n%s' % sample)
+                print(sample[30:])
+                start_text = sample[:30]
+                sleep(4.0)
         return sample
 
 if __name__ == '__main__':
